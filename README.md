@@ -1,6 +1,5 @@
 # SYN-flood
 TCP SYN Flooding DDoS
-(still under development...)
 **SYN Flood DDoS Attack Tool **
 
 This script demonstrates a SYN flood DDoS attack tool. It sends a massive number of TCP SYN packets to a target server, causing denial of service to legitimate users. The tool is for educational purposes only. Misuse or unauthorized use is strictly prohibited.
