@@ -23,11 +23,3 @@ python3 syn_flood_ddos.py 12345 example.com 80 5
 **Warning:**
 
 For educational purposes only. Unauthorized and malicious use is illegal and unethical. Misuse can lead to severe legal consequences.
-
-**Disclaimer:**
-
-I do not endorse illegal activities. Use responsibly and ethically. Not liable for misuse or damages.
-
-**Legal Notice:**
-
-Unauthorized access or disruption is illegal. Comply with laws and regulations. Author not liable for misuse.
