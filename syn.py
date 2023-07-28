@@ -21,7 +21,7 @@ def bilgi():
         print("Number of PACKETS: {}\t Successful: {}\t Failed: {}".format(p_num, successful_packets, failed_packets))
         print("Attack Time: {} seconds \n\n".format(time_diff))
         print("----------------------------------------------------------\n\n")
-        sys.exit(0)
+    sys.exit(0)  # This line should be indented correctly within the bilgi() function
 
 def attack(target_ip, port):
     global p_num, successful_packets, failed_packets, mut, time_diff
