@@ -60,3 +60,4 @@ if __name__ == "__main__":
             time_diff = time.time() - start_time
     except KeyboardInterrupt:
         bilgi()
+        
