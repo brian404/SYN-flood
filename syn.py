@@ -3,6 +3,7 @@ import socket
 import threading
 import time
 import signal
+from signal import SIGINT
 
 p_num = 0
 successful_packets = 0 
