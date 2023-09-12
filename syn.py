@@ -1,6 +1,7 @@
 # Import socket and tcp packet modules
 import socket
 import threading
+import sys
 from scapy.all import IP, TCP  
 
 # SYN flood attack function
