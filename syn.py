@@ -2,6 +2,7 @@ import sys
 import socket
 import threading
 import time
+import signal
 
 p_num = 0
 successful_packets = 0 
